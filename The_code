@@ -1,0 +1,77 @@
+#define buzzerpin 3
+#define ledpin 1
+#define triggerpin 5
+#define echopin 4
+#define motionpin 2
+
+
+void setup()
+{
+  pinMode(motionpin, INPUT);
+  pinMode(buzzerpin, OUTPUT);
+  pinMode(ledpin, OUTPUT);
+}
+
+long readUltrasonicDistance(int triggerPin, int echoPin)
+{
+  pinMode(triggerPin, OUTPUT); 
+  digitalWrite(triggerPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(triggerPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(triggerPin, LOW);
+  pinMode(echoPin, INPUT);
+  return pulseIn(echoPin, HIGH);
+}
+
+
+void loop()
+{
+  long distance = 0.01723 * readUltrasonicDistance(triggerpin, echopin); 
+  // calculate distance from ultasonic sensor
+  
+  if (distance < 30) // checking distance
+  {
+    if (digitalRead(motionpin) == HIGH) // check if motion is detected
+    {
+      while (digitalRead(motionpin) == HIGH) // loops while motion is detected
+      {
+        digitalWrite(buzzerpin, HIGH);
+        digitalWrite(ledpin, HIGH);
+        delay(200);  // wait 200 ms
+        digitalWrite(buzzerpin, LOW);
+        delay(200); // wait 200 ms
+        digitalWrite(ledpin, LOW);
+        digitalWrite(buzzerpin, HIGH);
+        delay(200); // wait 200 ms
+        digitalWrite(buzzerpin, LOW);
+        delay(200); // wait 200 ms
+        // makes led blink and buzzer make sound
+
+        Serial.print("distance ");
+        Serial.print(distance);
+        Serial.print(" cm");
+        Serial.print("\n");
+        Serial.print(digitalRead(motionpin));
+        Serial.print("\n");
+        // prints values into serial monitor
+      }
+    }
+  }
+  else 
+  {
+    digitalWrite(buzzerpin, LOW);
+    digitalWrite(ledpin, LOW);
+    // making sure both buzzer and led are turned off
+  }
+  
+  Serial.print("distance ");
+  Serial.print(distance);
+  Serial.print(" cm");
+  Serial.print("\n");
+  Serial.print(digitalRead(motionpin));
+  Serial.print("\n");
+  // prints values into serial monitor
+
+  delay(700);  // delay to slow down the loop speed otherwise electronics dont work properly
+}
